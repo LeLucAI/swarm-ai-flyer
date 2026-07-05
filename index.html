@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swarm.ai — THE battlefield intelligence · for Darkstar</title>
+<style>
+  :root{
+    --bg:#050505; --panel:#111111; --line:#2a2a2a;
+    --amber:#F5A700; --teal:#00A5AB; --red:#E5484D;
+    --white:#ffffff; --gray:#9a9a9a; --bone:#DBDBD3;
+    --font:'Avenir Next LT Pro','Avenir Next','Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--white);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--amber);color:#000}
+
+  /* ---------- header ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+    padding:18px 40px;mix-blend-mode:difference}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.35em;font-size:15px}
+  .brand img{height:26px;width:26px;object-fit:contain}
+  .fordark{color:var(--amber);font-style:italic;font-size:13px;letter-spacing:.08em;mix-blend-mode:normal}
+
+  section{position:relative;padding:110px 40px;max-width:1500px;margin:0 auto}
+  .kicker{color:var(--amber);font-weight:700;letter-spacing:.3em;font-size:13px;margin-bottom:14px}
+  .kicker .sub{color:var(--gray);font-weight:400;letter-spacing:.02em;text-transform:none;margin-left:14px;font-size:14px}
+
+  /* ---------- hero ---------- */
+  #hero{max-width:none;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 40px 80px;overflow:hidden}
+  #terrain{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-inner{position:relative;z-index:2}
+  h1{font-size:clamp(52px,8.5vw,124px);line-height:.98;font-weight:700;letter-spacing:-.01em;text-transform:uppercase}
+  h1 .dim{color:#3c3c3c}
+  .claim{margin-top:26px;color:var(--amber);font-size:clamp(20px,2.4vw,32px);font-weight:700;font-style:italic}
+  .hero-sub{margin-top:22px;max-width:560px;color:#cfcfcf;font-size:16px;line-height:1.55}
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--gray);font-size:11px;letter-spacing:.3em;z-index:2}
+  .scrollcue::after{content:"";display:block;width:1px;height:34px;background:var(--amber);margin:8px auto 0;animation:drip 1.8s infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- claim (bone / print-friendly) ---------- */
+  #claim{max-width:none;background:var(--bone);color:#0a0a0a;padding:110px 40px}
+  #claim .inner{max-width:1500px;margin:0 auto}
+  #claim h2{font-size:clamp(40px,5.4vw,84px);line-height:1.02;font-weight:700;text-transform:uppercase;letter-spacing:-.01em}
+  #claim h2 em{font-style:normal;color:#8a7500}
+  #claim p{max-width:640px;margin-top:28px;font-size:17px;line-height:1.6;color:#2b2b2b}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:44px}
+  .stat{border:1px solid #0a0a0a;padding:18px 22px;min-width:220px;flex:1}
+  .stat b{display:block;font-size:26px;margin-bottom:6px}
+  .stat span{font-size:13px;letter-spacing:.06em;color:#444}
+
+  /* ---------- mantyx cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+  .card{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;min-height:430px}
+  .card .num{font-size:44px;font-weight:700;padding:18px 20px 0}
+  .card .media{height:190px;margin:14px 14px 0;position:relative;overflow:hidden;background:#000}
+  .card .media video,.card .media img{width:100%;height:100%;object-fit:cover;display:block}
+  .card h3{padding:18px 20px 8px;font-size:17px;letter-spacing:.04em;border-bottom:1px solid var(--line);margin:0 20px;padding-left:0;padding-right:0}
+  .card p{padding:14px 20px 22px;color:var(--gray);font-size:13.5px;line-height:1.55}
+  .ph-tag{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);color:#777;font-size:9px;letter-spacing:.14em;padding:4px 7px;border:1px solid #333}
+
+  /* radar (card 01 + print alt) */
+  .radar{position:relative;width:100%;height:100%;background:#000}
+  .radar svg{width:100%;height:100%}
+  .sweep{transform-origin:50% 50%;animation:spin 4s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- how it works ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px;position:relative}
+  .step{border-top:1px solid var(--line);padding-top:18px}
+  .step .n{color:var(--amber);font-weight:700;font-size:13px;letter-spacing:.2em}
+  .step h3{font-size:20px;margin:10px 0 8px;font-style:italic}
+  .step h3 span{color:var(--amber)}
+  .step p{color:var(--gray);font-size:13.5px;line-height:1.5}
+
+  /* ---------- battlespace ---------- */
+  #battle .wrap{display:grid;grid-template-columns:1.6fr 1fr;gap:40px;align-items:center;margin-top:30px}
+  #battle .svgbox{border:1px solid var(--line)}
+  #battle svg{display:block;width:100%;height:auto}
+  .chips{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+  .chip{border:1px solid var(--line);padding:14px 16px;display:flex;gap:14px;align-items:baseline}
+  .chip b{color:var(--amber);font-size:13px;letter-spacing:.14em;white-space:nowrap}
+  .chip.teal b{color:var(--teal)}
+  .chip span{color:var(--gray);font-size:13px;line-height:1.45}
+  #battle .lead{color:#cfcfcf;font-size:16px;line-height:1.6}
+
+  /* ---------- day/night EO-IR sweep (card 02) ---------- */
+  .daynight{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
+  .daynight img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .daynight .ir{filter:grayscale(1) invert(1) contrast(1.4) brightness(.92);clip-path:inset(0 0 0 50%);animation:irsweep 7s ease-in-out infinite alternate}
+  .daynight .divline{position:absolute;top:0;bottom:0;width:2px;background:var(--teal);left:50%;animation:divmove 7s ease-in-out infinite alternate}
+  @keyframes irsweep{from{clip-path:inset(0 0 0 18%)}to{clip-path:inset(0 0 0 78%)}}
+  @keyframes divmove{from{left:18%}to{left:78%}}
+  .daynight .lbl{position:absolute;bottom:6px;font-size:10px;letter-spacing:.2em;padding:2px 6px;background:rgba(0,0,0,.6)}
+  .daynight .lbl.eo{left:8px;color:var(--amber)}
+  .daynight .lbl.irl{right:8px;color:var(--teal)}
+
+  /* ---------- deploy-anywhere animation (card 04) ---------- */
+  .deploy svg{width:100%;height:100%;background:#000}
+  .pop{transform-box:fill-box;transform-origin:50% 100%;animation:pop 5.4s ease-out infinite}
+  .pop.d2{animation-delay:.9s}
+  .pop.d3{animation-delay:1.8s}
+  @keyframes pop{0%,6%{transform:scale(0)}14%,86%{transform:scale(1)}94%,100%{transform:scale(0)}}
+
+  /* ---------- reconstructed world (real recon video) ---------- */
+  .recon{position:relative;margin-top:14px;border:1px solid var(--line);background:#f2f2ee;display:flex;justify-content:center;overflow:hidden}
+  .recon video{height:480px;display:block}
+  .recon .tag{position:absolute;top:12px;left:12px;background:rgba(5,5,5,.88);color:var(--teal);font-size:11px;letter-spacing:.16em;padding:6px 10px;font-weight:700}
+  .recon .cap{position:absolute;bottom:0;left:0;right:0;background:rgba(5,5,5,.88);color:var(--gray);font-size:12.5px;padding:10px 14px}
+  .recon .cap b{color:var(--amber)}
+  .tracker{position:absolute;width:110px;height:84px;border:2px dashed var(--red);pointer-events:none;animation:trackpath 10.9s ease-in-out infinite}
+  .tracker::after{content:"UAV · 3D TRACKED";position:absolute;top:-20px;left:-2px;color:var(--red);font-size:11px;letter-spacing:1.5px;font-weight:700;white-space:nowrap}
+  @keyframes trackpath{
+    0%{left:47%;top:36%}
+    22%{left:42%;top:47%}
+    45%{left:39%;top:42%}
+    70%{left:36%;top:37%}
+    100%{left:47%;top:36%}
+  }
+  .recon .print-alt{width:100%;object-fit:cover}
+
+  /* placeholder box (media pending) */
+  .ph-box{aspect-ratio:16/9;border:1px dashed #4a4a4a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#666;background:#0b0b0b}
+  .ph-box b{color:#8a8a8a;letter-spacing:.22em;font-size:12px}
+  .ph-box span{font-size:12px;color:#555}
+
+  /* animated svg bits */
+  .march{stroke-dasharray:8 10;animation:march 1.2s linear infinite}
+  @keyframes march{to{stroke-dashoffset:-18}}
+  .bob{animation:bob 5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .flick{animation:flick 3s ease-in-out infinite}
+  @keyframes flick{0%,100%{opacity:.45}50%{opacity:.15}}
+
+  /* restyle third-party placeholder loops (tint + mirror = our look) */
+  .tint-amber{filter:grayscale(1) sepia(1) saturate(3.4) hue-rotate(-12deg) brightness(1.12) contrast(1.05)}
+  .tint-teal{filter:grayscale(1) sepia(1) saturate(3.4) hue-rotate(140deg) brightness(1.05)}
+  .mirror{transform:scaleX(-1)}
+
+  /* ---------- proof ---------- */
+  .proof{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+  .shot{position:relative;border:1px solid var(--line)}
+  .shot img,.shot video{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+
+  /* animated night-city: slow drift + live detection boxes */
+  .cityshot{position:relative;aspect-ratio:16/9;overflow:hidden}
+  .cityshot img{position:absolute;inset:0;height:100%;animation:kenburns 38s ease-in-out infinite alternate;transform-origin:60% 70%}
+  @keyframes kenburns{from{transform:scale(1.02) translate(0,0)}to{transform:scale(1.22) translate(-3.5%,-4.5%)}}
+  .detover{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .det{fill:none;stroke:var(--red);stroke-width:2;opacity:0;animation:det 5s infinite}
+  @keyframes det{0%,100%{opacity:0}8%,72%{opacity:1}86%{opacity:.2}}
+  .detg{animation:drift 11s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translate(9px,-6px)}}
+  .det-label{fill:var(--red);font-size:13px;letter-spacing:2px;font-family:var(--font);opacity:0;animation:det 5s infinite}
+  .shot figcaption{padding:12px 14px;font-size:12.5px;color:var(--gray);border-top:1px solid var(--line)}
+  .shot figcaption b{color:var(--teal);letter-spacing:.1em}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);margin-top:40px}
+  .loop{display:flex;gap:0;justify-content:center;align-items:center;padding:44px 20px 10px;flex-wrap:wrap;color:var(--gray);letter-spacing:.25em;font-size:12px}
+  .loop b{color:var(--white)}
+  .loop .arr{color:var(--amber);margin:0 16px}
+  .contact{display:flex;justify-content:space-between;padding:30px 40px 40px;color:var(--gray);font-size:13px;flex-wrap:wrap;gap:10px}
+  .contact a{color:var(--amber);text-decoration:none}
+  .legal{max-width:none;padding:0 40px 30px;color:#555;font-size:10.5px}
+
+  /* reveal on scroll */
+  .rv{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .rv.on{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .rv{opacity:1;transform:none;transition:none}
+    .sweep,.march,.bob,.flick,.scrollcue::after,.cityshot img,.det,.detg,.det-label{animation:none}
+    .det,.det-label{opacity:1}
+  }
+
+  .print-alt{display:none}
+
+  /* =========== PRINT =========== */
+  @media print{
+    @page{size:A4;margin:9mm}
+    :root{--panel:#0d0d0d}
+    body{background:#050505 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    header{position:static;mix-blend-mode:normal;padding:0 0 6mm}
+    section{padding:8mm 0;max-width:none;page-break-inside:avoid}
+    #hero{min-height:0;padding:2mm 0 8mm}
+    #terrain,.scrollcue{display:none}
+    h1{font-size:44pt}
+    .claim{font-size:16pt}
+    .hero-sub{font-size:10pt}
+    #claim{padding:8mm;margin:0 -0mm}
+    #claim h2{font-size:26pt}
+    #claim p{font-size:10pt}
+    .stat b{font-size:14pt}
+    video{display:none !important}
+    .print-alt{display:block}
+    .card{min-height:0}
+    .card .media{height:34mm}
+    .cards,.steps{gap:4mm}
+    #battle .wrap{grid-template-columns:1.55fr 1fr;gap:6mm}
+    .proof{page-break-inside:avoid}
+    .cityshot img{animation:none;transform:none;position:static}
+    .cityshot{aspect-ratio:auto}
+    .det,.det-label{animation:none;opacity:1}
+    .detg{animation:none}
+    .ph-tag{display:none}
+    footer{page-break-inside:avoid}
+    section#mantyx{page-break-before:always}
+    section#battle{page-break-before:always}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><img src="assets/logo.png" alt=""><span>SWARM.AI</span></div>
+  <div class="fordark">for DARKSTAR_</div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+  <canvas id="terrain"></canvas>
+  <div class="hero-inner">
+    <h1>Every threat.<br>Seen in 3D.<br><span class="dim">Live.</span></h1>
+    <div class="claim">THE battlefield intelligence_</div>
+    <p class="hero-sub">Swarm.ai turns meshes of small, thinking optical sensors into one live 3D picture
+      of the battlespace — for every operator, every effector, on kilobits of bandwidth.</p>
+  </div>
+  <div class="scrollcue">SCROLL</div>
+</section>
+
+<!-- ============ CLAIM ============ -->
+<section id="claim">
+  <div class="inner rv">
+    <h2>Affordable mass,<br><em>applied to perception.</em></h2>
+    <p>One high-end radar is one expensive target. We deploy many low-cost intelligent sensors instead —
+      performance scales with the number of nodes, coverage scales like software, and losing one node
+      loses almost nothing. A single operator supervises it all.</p>
+    <div class="stats">
+      <div class="stat"><b>10&times;</b><span>more cost-effective than centralized high-end sensing</span></div>
+      <div class="stat"><b>360&deg; / 1 Hz</b><span>full-sky scan, day &amp; night, per node</span></div>
+      <div class="stat"><b>kbit/s</b><span>3D tracks instead of video — thin links are enough</span></div>
+      <div class="stat"><b>1 operator</b><span>human on the loop — machines do the watching</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MANTYX ============ -->
+<section id="mantyx">
+  <div class="kicker rv">MANTYX_<span class="sub">our core product — the AI sensor node</span></div>
+  <div class="cards">
+    <div class="card rv">
+      <div class="num">01</div>
+      <div class="media">
+        <div class="radar">
+          <svg viewBox="0 0 400 190">
+            <circle cx="200" cy="95" r="86" fill="none" stroke="#333" stroke-width="1.5"/>
+            <circle cx="200" cy="95" r="56" fill="none" stroke="#2c2c2c" stroke-width="1.5"/>
+            <circle cx="200" cy="95" r="26" fill="none" stroke="#262626" stroke-width="1.5"/>
+            <g class="sweep"><path d="M200 95 L200 9 A86 86 0 0 1 261 34 Z" fill="#F5A700" opacity=".25"/>
+            <line x1="200" y1="95" x2="200" y2="9" stroke="#F5A700" stroke-width="2"/></g>
+            <circle cx="200" cy="95" r="7" fill="#F5A700"/>
+            <path d="M148 52 l8 15 h-16 z" fill="#F5A700"/>
+            <rect x="139" y="43" width="34" height="34" fill="none" stroke="#E5484D" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M252 54 l7 13 h-14 z" fill="#F5A700"/>
+            <path d="M274 98 l7 13 h-14 z" fill="#F5A700" opacity=".8"/>
+            <path d="M238 136 l7 13 h-14 z" fill="#F5A700"/>
+            <path d="M162 132 l7 13 h-14 z" fill="#F5A700" opacity=".7"/>
+            <path d="M122 92 l7 13 h-14 z" fill="#F5A700" opacity=".85"/>
+            <path d="M212 34 l7 13 h-14 z" fill="#F5A700"/>
+            <rect x="245" y="47" width="28" height="28" fill="none" stroke="#E5484D" stroke-width="2" stroke-dasharray="5 4"/>
+          </svg>
+        </div>
+      </div>
+      <h3>SCANS 360&deg; EVERY SECOND</h3>
+      <p>A rotating optical head sweeps the whole sky once per second — nothing enters unseen, out to km range.</p>
+    </div>
+    <div class="card rv">
+      <div class="num">02</div>
+      <div class="media">
+        <div class="daynight">
+          <img src="assets/city.png" alt="">
+          <img class="ir" src="assets/city.png" alt="">
+          <div class="divline"></div>
+          <div class="lbl eo">EO</div><div class="lbl irl">IR</div>
+        </div>
+        <img class="print-alt" src="assets/city.png" alt="">
+      </div>
+      <h3>SEES DAY + NIGHT</h3>
+      <p>Colour and thermal vision fused in one instrument — the same sharp picture at noon and at 3 a.m.</p>
+    </div>
+    <div class="card rv">
+      <div class="num">03</div>
+      <div class="media">
+        <video src="assets/pose-demo.mp4" autoplay muted loop playsinline></video>
+        <img class="print-alt" src="assets/pose-demo.jpg" alt="">
+        <div class="ph-tag" style="color:#00A5AB;border-color:#00A5AB">LIVE_ REAL OUTPUT</div>
+      </div>
+      <h3>THINKS ON THE EDGE</h3>
+      <p>AI on the chip detects, classifies and tracks in 3D — live 6-DoF pose and flight path, real footage.</p>
+    </div>
+    <div class="card rv">
+      <div class="num">04</div>
+      <div class="media">
+        <div class="deploy">
+          <svg viewBox="0 0 400 190">
+            <line x1="20" y1="160" x2="380" y2="160" stroke="#2a2a2a" stroke-width="2"/>
+            <g stroke="#00A5AB" stroke-width="2" stroke-dasharray="5 7" class="march">
+              <line x1="80" y1="96" x2="196" y2="76"/>
+              <line x1="212" y1="76" x2="322" y2="102"/>
+            </g>
+            <g class="pop">
+              <rect x="76" y="112" width="8" height="48" fill="#3a3a3a"/>
+              <path d="M64 160 l16 -12 M96 160 l-16 -12" stroke="#3a3a3a" stroke-width="5" fill="none"/>
+              <circle cx="80" cy="106" r="12" fill="#1c1c1c" stroke="#00A5AB" stroke-width="3.5"/>
+              <circle cx="80" cy="106" r="4.5" fill="#F5A700"/>
+            </g>
+            <g class="pop d2">
+              <rect x="168" y="128" width="66" height="22" rx="4" fill="#2a2a2a"/>
+              <circle cx="184" cy="156" r="9" fill="#1a1a1a"/><circle cx="218" cy="156" r="9" fill="#1a1a1a"/>
+              <rect x="199" y="92" width="7" height="36" fill="#3a3a3a"/>
+              <circle cx="203" cy="86" r="12" fill="#1c1c1c" stroke="#00A5AB" stroke-width="3.5"/>
+              <circle cx="203" cy="86" r="4.5" fill="#F5A700"/>
+            </g>
+            <g class="pop d3">
+              <path d="M310 160 l16 -38 l16 38" fill="none" stroke="#3a3a3a" stroke-width="5"/>
+              <circle cx="326" cy="112" r="12" fill="#1c1c1c" stroke="#00A5AB" stroke-width="3.5"/>
+              <circle cx="326" cy="112" r="4.5" fill="#F5A700"/>
+            </g>
+            <text x="200" y="182" fill="#5f5f5f" font-size="12" letter-spacing="3" text-anchor="middle" font-family="inherit">TRIPOD · VEHICLE · MAST</text>
+          </svg>
+        </div>
+        <img class="print-alt" src="assets/city.png" alt="">
+      </div>
+      <h3>SMALL &amp; DEPLOYABLE</h3>
+      <p>Under 2 kg, low power. On a tripod, a vehicle, a mast or a drone — deployed in minutes, anywhere.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how">
+  <div class="kicker rv">HOW IT WORKS_<span class="sub">from photons to decisions</span></div>
+  <div class="steps">
+    <div class="step rv"><div class="n">01</div><h3><span>&gt;&gt;</span> Collect_</h3><p>Every node scans 360&deg;, day &amp; night, over any area you need covered.</p></div>
+    <div class="step rv"><div class="n">02</div><h3><span>&gt;&gt;</span> Perceive_</h3><p>On-board AI turns raw imagery into 3D position, orientation and flight path of every target.</p></div>
+    <div class="step rv"><div class="n">03</div><h3><span>&gt;&gt;</span> Connect_</h3><p>Nodes fuse raw, low-level data across the mesh — many eyes become one sensor.</p></div>
+    <div class="step rv"><div class="n">04</div><h3><span>&gt;&gt;</span> Reconstruct_</h3><p>The battlespace, rebuilt live in 3D — for operators, C2 and effectors.</p></div>
+  </div>
+</section>
+
+<!-- ============ BATTLESPACE ============ -->
+<section id="battle">
+  <div class="kicker rv">LIVE 3D BATTLESPACE_<span class="sub">the mesh rebuilds terrain and every moving object in 3D</span></div>
+  <div class="wrap">
+    <div class="svgbox rv" id="battlesvg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1860 800" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <clipPath id="panel"><rect x="2" y="2" width="1856" height="796" rx="18"/></clipPath>
+    <linearGradient id="wing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9AA2AB"/><stop offset="0.5" stop-color="#5C646D"/><stop offset="1" stop-color="#2E343B"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0D0D0D"/><stop offset="1" stop-color="#131A1B"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1860" height="800" rx="18" fill="url(#sky)" stroke="#2A2A2A" stroke-width="2"/>
+  <g clip-path="url(#panel)">
+    <polyline points="0.0,299.4 132.9,297.6 265.7,294.4 398.6,292.0 531.4,293.0 664.3,295.8 797.1,298.2 930.0,299.0 1062.9,297.8 1195.7,295.4 1328.6,294.1 1461.4,295.0 1594.3,297.1 1727.1,298.7 1860.0,299.5" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.13"/>
+<polyline points="-41.8,315.0 97.0,312.4 235.8,307.6 374.7,304.0 513.5,305.4 652.3,309.8 791.2,313.4 930.0,314.6 1068.8,312.6 1207.7,309.0 1346.5,307.1 1485.3,308.6 1624.2,311.7 1763.0,314.1 1901.8,315.3" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.16"/>
+<polyline points="-83.7,333.6 61.1,329.9 205.9,323.1 350.7,318.0 495.6,320.0 640.4,326.2 785.2,331.3 930.0,333.0 1074.8,330.2 1219.6,325.1 1364.4,322.4 1509.3,324.5 1654.1,328.9 1798.9,332.3 1943.7,334.0" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.19"/>
+<polyline points="-125.5,356.2 25.2,351.1 176.0,341.9 326.8,335.0 477.6,337.8 628.4,346.0 779.2,352.9 930.0,355.2 1080.8,351.6 1231.6,344.7 1382.4,341.0 1533.2,343.7 1684.0,349.7 1834.8,354.3 1985.5,356.6" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.22"/>
+<polyline points="-167.4,382.6 -10.6,376.0 146.1,364.0 302.9,355.0 459.7,358.6 616.5,369.4 773.2,378.4 930.0,381.4 1086.8,376.6 1243.5,367.6 1400.3,362.8 1557.1,366.4 1713.9,374.2 1870.6,380.2 2027.4,383.2" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.25"/>
+<polyline points="-209.3,414.0 -46.5,405.6 116.3,390.4 279.0,379.0 441.8,383.6 604.5,397.2 767.3,408.6 930.0,412.4 1092.8,406.4 1255.5,395.0 1418.3,388.9 1581.0,393.4 1743.8,403.3 1906.5,410.9 2069.3,414.7" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.28"/>
+<polyline points="-251.1,450.3 -82.4,440.2 86.4,421.8 255.1,408.0 423.8,413.5 592.5,430.1 761.3,443.9 930.0,448.5 1098.7,441.1 1267.5,427.3 1436.2,420.0 1604.9,425.5 1773.6,437.4 1942.4,446.6 2111.1,451.2" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.31"/>
+<polyline points="-293.0,492.6 -118.2,480.5 56.5,458.5 231.2,442.0 405.9,448.6 580.6,468.4 755.3,484.9 930.0,490.4 1104.7,481.6 1279.4,465.1 1454.1,456.3 1628.8,462.9 1803.5,477.2 1978.2,488.2 2152.9,493.7" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.34"/>
+<polyline points="-334.8,540.9 -154.1,526.8 26.6,501.2 207.3,482.0 387.9,489.7 568.6,512.7 749.3,531.9 930.0,538.3 1110.7,528.1 1291.4,508.9 1472.1,498.6 1652.7,506.3 1833.4,523.0 2014.1,535.8 2194.8,542.2" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.37"/>
+<polyline points="-376.7,596.1 -190.0,579.8 -3.3,550.2 183.3,528.0 370.0,536.9 556.7,563.5 743.3,585.7 930.0,593.1 1116.7,581.3 1303.3,559.1 1490.0,547.2 1676.7,556.1 1863.3,575.4 2050.0,590.2 2236.7,597.6" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.40"/>
+<polyline points="-418.5,658.2 -225.9,639.5 -33.2,605.5 159.4,580.0 352.1,590.2 544.7,620.8 737.4,646.3 930.0,654.8 1122.6,641.2 1315.3,615.7 1507.9,602.1 1700.6,612.3 1893.2,634.4 2085.9,651.4 2278.5,659.9" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.43"/>
+<polyline points="-460.4,728.2 -261.7,706.9 -63.1,668.1 135.5,639.0 334.1,650.6 532.8,685.6 731.4,714.7 930.0,724.4 1128.6,708.8 1327.2,679.7 1525.9,664.2 1724.5,675.9 1923.1,701.1 2121.7,720.5 2320.4,730.2" fill="none" stroke="#00A5AB" stroke-width="2.2" opacity="0.46"/>
+<polyline points="0.0,299.4 -41.8,315.0 -83.7,333.6 -125.5,356.2 -167.4,382.6 -209.3,414.0 -251.1,450.3 -293.0,492.6 -334.8,540.9 -376.7,596.1 -418.5,658.2 -460.4,728.2" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="132.9,297.6 97.0,312.4 61.1,329.9 25.2,351.1 -10.6,376.0 -46.5,405.6 -82.4,440.2 -118.2,480.5 -154.1,526.8 -190.0,579.8 -225.9,639.5 -261.7,706.9" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="265.7,294.4 235.8,307.6 205.9,323.1 176.0,341.9 146.1,364.0 116.3,390.4 86.4,421.8 56.5,458.5 26.6,501.2 -3.3,550.2 -33.2,605.5 -63.1,668.1" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="398.6,292.0 374.7,304.0 350.7,318.0 326.8,335.0 302.9,355.0 279.0,379.0 255.1,408.0 231.2,442.0 207.3,482.0 183.3,528.0 159.4,580.0 135.5,639.0" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="531.4,293.0 513.5,305.4 495.6,320.0 477.6,337.8 459.7,358.6 441.8,383.6 423.8,413.5 405.9,448.6 387.9,489.7 370.0,536.9 352.1,590.2 334.1,650.6" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="664.3,295.8 652.3,309.8 640.4,326.2 628.4,346.0 616.5,369.4 604.5,397.2 592.5,430.1 580.6,468.4 568.6,512.7 556.7,563.5 544.7,620.8 532.8,685.6" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="797.1,298.2 791.2,313.4 785.2,331.3 779.2,352.9 773.2,378.4 767.3,408.6 761.3,443.9 755.3,484.9 749.3,531.9 743.3,585.7 737.4,646.3 731.4,714.7" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="930.0,299.0 930.0,314.6 930.0,333.0 930.0,355.2 930.0,381.4 930.0,412.4 930.0,448.5 930.0,490.4 930.0,538.3 930.0,593.1 930.0,654.8 930.0,724.4" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1062.9,297.8 1068.8,312.6 1074.8,330.2 1080.8,351.6 1086.8,376.6 1092.8,406.4 1098.7,441.1 1104.7,481.6 1110.7,528.1 1116.7,581.3 1122.6,641.2 1128.6,708.8" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1195.7,295.4 1207.7,309.0 1219.6,325.1 1231.6,344.7 1243.5,367.6 1255.5,395.0 1267.5,427.3 1279.4,465.1 1291.4,508.9 1303.3,559.1 1315.3,615.7 1327.2,679.7" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1328.6,294.1 1346.5,307.1 1364.4,322.4 1382.4,341.0 1400.3,362.8 1418.3,388.9 1436.2,420.0 1454.1,456.3 1472.1,498.6 1490.0,547.2 1507.9,602.1 1525.9,664.2" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1461.4,295.0 1485.3,308.6 1509.3,324.5 1533.2,343.7 1557.1,366.4 1581.0,393.4 1604.9,425.5 1628.8,462.9 1652.7,506.3 1676.7,556.1 1700.6,612.3 1724.5,675.9" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1594.3,297.1 1624.2,311.7 1654.1,328.9 1684.0,349.7 1713.9,374.2 1743.8,403.3 1773.6,437.4 1803.5,477.2 1833.4,523.0 1863.3,575.4 1893.2,634.4 1923.1,701.1" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1727.1,298.7 1763.0,314.1 1798.9,332.3 1834.8,354.3 1870.6,380.2 1906.5,410.9 1942.4,446.6 1978.2,488.2 2014.1,535.8 2050.0,590.2 2085.9,651.4 2121.7,720.5" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+<polyline points="1860.0,299.5 1901.8,315.3 1943.7,334.0 1985.5,356.6 2027.4,383.2 2069.3,414.7 2111.1,451.2 2152.9,493.7 2194.8,542.2 2236.7,597.6 2278.5,659.9 2320.4,730.2" fill="none" stroke="#00A5AB" stroke-width="1.6" opacity="0.16"/>
+
+
+    <!-- mesh nodes on terrain + links -->
+    
+  <g transform="translate(430,585)">
+    <ellipse rx="34" ry="12" fill="none" stroke="#00A5AB" stroke-width="3" opacity="0.55"/>
+    <rect x="-5" y="-26" width="10" height="22" fill="#3A3A3A"/>
+    <circle cy="-34" r="13" fill="#1C1C1C" stroke="#00A5AB" stroke-width="4"/>
+    <circle cy="-34" r="5" fill="#F5A700"/>
+  </g>
+    
+  <g transform="translate(930,640)">
+    <ellipse rx="34" ry="12" fill="none" stroke="#00A5AB" stroke-width="3" opacity="0.55"/>
+    <rect x="-5" y="-26" width="10" height="22" fill="#3A3A3A"/>
+    <circle cy="-34" r="13" fill="#1C1C1C" stroke="#00A5AB" stroke-width="4"/>
+    <circle cy="-34" r="5" fill="#F5A700"/>
+  </g>
+    
+  <g transform="translate(1330,575)">
+    <ellipse rx="34" ry="12" fill="none" stroke="#00A5AB" stroke-width="3" opacity="0.55"/>
+    <rect x="-5" y="-26" width="10" height="22" fill="#3A3A3A"/>
+    <circle cy="-34" r="13" fill="#1C1C1C" stroke="#00A5AB" stroke-width="4"/>
+    <circle cy="-34" r="5" fill="#F5A700"/>
+  </g>
+    <g stroke="#00A5AB" stroke-width="4" stroke-dasharray="8 10" opacity="0.85">
+      <line x1="475" y1="572" x2="885" y2="618"/>
+      <line x1="975" y1="618" x2="1285" y2="562"/>
+    </g>
+
+    <!-- tracking rays -->
+    <g stroke="#F5A700" stroke-width="2.5" opacity="0.45">
+      <line x1="430" y1="545" x2="690" y2="290"/>
+      <line x1="930" y1="600" x2="775" y2="305"/>
+    </g>
+
+    <!-- past trajectory -->
+    <path d="M60 320 Q 360 275 620 250" fill="none" stroke="#F5A700" stroke-width="3" stroke-dasharray="2 12" opacity="0.8"/>
+
+    <!-- flying-wing UAV -->
+    <g transform="translate(745,235) rotate(-6)">
+      <path d="M-115 32 L0 -26 L115 32 L62 22 L0 2 L-62 22 Z" fill="url(#wing)" stroke="#B9BFC6" stroke-width="2"/>
+      <ellipse cx="0" cy="-4" rx="16" ry="9" fill="#7E868F"/>
+    </g>
+
+    <!-- 3D bounding box (perspective cube) -->
+    <g stroke="#E5484D" stroke-width="3" fill="none" stroke-dasharray="9 7">
+      <rect x="615" y="175" width="265" height="125"/>
+      <rect x="655" y="150" width="265" height="125" opacity="0.55"/>
+    </g>
+    <g stroke="#E5484D" stroke-width="2.5" opacity="0.55">
+      <line x1="615" y1="175" x2="655" y2="150"/>
+      <line x1="880" y1="175" x2="920" y2="150"/>
+      <line x1="615" y1="300" x2="655" y2="275"/>
+      <line x1="880" y1="300" x2="920" y2="275"/>
+    </g>
+    <text x="617" y="337" fill="#E5484D" font-size="26" font-weight="bold" letter-spacing="1">FLYING-WING UAV · 3D TRACKED</text>
+
+    <!-- output: low data -->
+    <g>
+      <line x1="1395" y1="560" x2="1462" y2="520" stroke="#F5A700" stroke-width="4"/>
+      <path d="M1482 508 l-30 -2 12 26 z" fill="#F5A700"/>
+    </g>
+    <rect x="1490" y="365" width="330" height="84" rx="12" fill="#1A1A1A" stroke="#00A5AB" stroke-width="4"/>
+    <text x="1655" y="403" fill="#00A5AB" font-size="28" font-weight="bold" text-anchor="middle">OPERATORS / C2</text>
+    <text x="1655" y="435" fill="#B0B0B0" font-size="22" text-anchor="middle">the battlespace, live in 3D</text>
+
+    <rect x="1490" y="470" width="330" height="84" rx="12" fill="#1A1A1A" stroke="#F5A700" stroke-width="4"/>
+    <text x="1655" y="508" fill="#F5A700" font-size="28" font-weight="bold" text-anchor="middle">EFFECTORS</text>
+    <text x="1655" y="540" fill="#B0B0B0" font-size="22" text-anchor="middle">machine-ready 3D tracks</text>
+
+    <!-- low-data tag -->
+    <g transform="translate(1490,590)">
+      <rect width="330" height="60" rx="10" fill="none" stroke="#3A3A3A" stroke-width="2"/>
+      <rect x="22" y="24" width="7" height="14" fill="#F5A700"/>
+      <rect x="33" y="18" width="7" height="20" fill="#F5A700" opacity="0.65"/>
+      <rect x="44" y="28" width="7" height="10" fill="#F5A700" opacity="0.4"/>
+      <text x="66" y="25" fill="#9A9A9A" font-size="17" letter-spacing="2">LOW DATA_</text>
+      <text x="66" y="48" fill="#F5A700" font-size="21" font-weight="bold">kilobits, not gigabytes</text>
+    </g>
+
+    <!-- title -->
+    <text x="70" y="88" fill="#F5A700" font-size="40" font-weight="bold" letter-spacing="3">LIVE 3D BATTLESPACE_</text>
+    <text x="70" y="130" fill="#9A9A9A" font-size="27">the mesh rebuilds terrain and every moving object in 3D</text>
+
+    <!-- bottom caption -->
+    <text x="70" y="755" fill="#8A8A8A" font-size="24"><tspan fill="#F5A700" font-style="italic" font-weight="bold">&gt;&gt; field-proven_</tspan>  live 3D pose &amp; track demonstrated in field tests</text>
+  </g>
+</svg>
+</div>
+    <div class="rv">
+      <p class="lead">Operators don't watch twenty video feeds. They see one reconstructed 3D world —
+        terrain, threats, trajectories — and machines get the same picture in their own language.</p>
+      <div class="chips">
+        <div class="chip"><b>LOW DATA_</b><span>kilobits, not gigabytes — works over contested, thin battlefield links</span></div>
+        <div class="chip teal"><b>HUMAN ON THE LOOP_</b><span>one operator supervises; every engagement decision stays human</span></div>
+        <div class="chip"><b>LEARNS EVERY MISSION_</b><span>rapid in-field retraining — new threat today, updated model tomorrow</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="recon rv">
+    <video src="assets/recon-world.mp4" autoplay muted loop playsinline></video>
+    <img class="print-alt" src="assets/recon-world.jpg" alt="3D reconstructed terrain">
+    <div class="tracker"></div>
+    <div class="tag">RECONSTRUCTED WORLD_ REAL OUTPUT</div>
+    <div class="cap"><b>Actual 3D reconstruction:</b> terrain rebuilt from imagery, with the full flight path of a tracked flyer — every pose, in world coordinates. The same pipeline tracks UAVs.</div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section id="proof">
+  <div class="kicker rv">FIELD-PROVEN_<span class="sub">real system output, not renders</span></div>
+  <div class="proof">
+    <figure class="shot rv">
+      <div class="ph-box"><b>PLACEHOLDER_</b><span>mission footage / deployment photo goes here</span></div>
+      <figcaption><b>IN THE FIELD</b> &mdash; deployment imagery, coming with the next field campaign.</figcaption></figure>
+    <figure class="shot rv">
+      <div class="cityshot">
+        <img src="assets/city.png" alt="Urban protection scenario">
+        <svg class="detover" viewBox="0 0 1600 900" preserveAspectRatio="none">
+          <g class="detg">
+            <rect class="det" x="610" y="565" width="86" height="60" style="animation-delay:.2s"/>
+            <rect class="det" x="720" y="540" width="70" height="52" style="animation-delay:1.1s"/>
+            <rect class="det" x="668" y="640" width="58" height="44" style="animation-delay:2.3s"/>
+            <text class="det-label" x="612" y="552" style="animation-delay:.2s">TRACKED</text>
+          </g>
+          <g class="detg" style="animation-delay:-5s;animation-direction:alternate-reverse">
+            <rect class="det" x="1010" y="470" width="64" height="48" style="animation-delay:3.1s"/>
+            <rect class="det" x="1120" y="520" width="52" height="40" style="animation-delay:4.2s"/>
+            <text class="det-label" x="1012" y="458" style="animation-delay:3.1s">TRACKED</text>
+          </g>
+          <g class="detg" style="animation-delay:-8s">
+            <rect class="det" x="360" y="430" width="56" height="42" style="animation-delay:1.8s"/>
+            <rect class="det" x="452" y="700" width="74" height="52" style="animation-delay:3.7s"/>
+          </g>
+        </svg>
+      </div>
+      <figcaption><b>PROTECTING WIDE AREAS</b> &mdash; the mesh watches a whole city at once; every contact tracked in real time.</figcaption></figure>
+  </div>
+</section>
+
+<footer>
+  <div class="loop rv"><b>DEPLOY</b><span class="arr">&rarr;</span><b>PERCEIVE</b><span class="arr">&rarr;</span><b>ACT</b><span class="arr">&rarr;</span><b>LEARN</b><span class="arr">&#8635;</span></div>
+  <div class="contact">
+    <span>Swarm.ai &mdash; distributed 3D perception for defense</span>
+    <span>Lukas Karge &nbsp;&middot;&nbsp; <a href="mailto:l.karge@3dwe.ai">l.karge@3dwe.ai</a></span>
+  </div>
+  <div class="legal">&copy; Swarm.ai 2026 &mdash; draft for Darkstar. All media own footage or original graphics.</div>
+</footer>
+
+<script>
+/* ---------- inline the battlespace svg with animation classes ---------- */
+{
+  const box=document.getElementById('battlesvg');
+  const svg=box.querySelector('svg');
+  svg.querySelectorAll('[stroke-dasharray]').forEach(el=>{
+    const d=el.getAttribute('stroke-dasharray');
+    if(d==='8 10'||d==='9 11') el.classList.add('march');
+    if(d==='2 12') el.classList.add('march');
+  });
+  const wing=[...svg.querySelectorAll('g')].find(g=>(g.getAttribute('transform')||'').includes('rotate(-6)'));
+  if(wing) wing.classList.add('bob');
+}
+
+/* ---------- restyle placeholder loops: slower + tinted (see CSS) ---------- */
+document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.playbackRate=0.7});
+
+/* ---------- reveal on scroll ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ---------- hero terrain canvas ---------- */
+const cv=document.getElementById('terrain'),ctx=cv.getContext('2d');
+let W,H,t=0;
+const fit=()=>{W=cv.width=innerWidth*devicePixelRatio;H=cv.height=cv.offsetHeight*devicePixelRatio};
+addEventListener('resize',fit);fit();
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function hill(x,z){return Math.sin(x*1.7+1)*Math.cos(z*1.3)*0.55+Math.sin(x*4.1)*0.12;}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const rows=16,cols=26,horizon=H*0.32,depth=H*0.75;
+  for(let i=0;i<rows;i++){
+    const z=i/rows,zn=z+((t*0.018)%(1/rows));
+    const y0=horizon+Math.pow(zn,1.7)*depth,persp=0.25+zn*0.95;
+    ctx.beginPath();
+    for(let j=0;j<=cols;j++){
+      const u=j/cols,x=W/2+(u-0.5)*W*1.35*persp;
+      const y=y0-hill(u*6,zn*9)*90*devicePixelRatio*zn;
+      j?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.strokeStyle=`rgba(0,165,171,${0.05+zn*0.22})`;ctx.lineWidth=1.1*devicePixelRatio;ctx.stroke();
+  }
+  /* scanning beam */
+  const sx=W*(0.5+0.42*Math.sin(t*0.01));
+  const g=ctx.createLinearGradient(sx-90,0,sx+90,0);
+  g.addColorStop(0,'rgba(245,167,0,0)');g.addColorStop(.5,'rgba(245,167,0,0.07)');g.addColorStop(1,'rgba(245,167,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(sx-90,horizon*0.5,180,H);
+  /* flying wing silhouette */
+  const wx=W*(0.18+0.62*((t*0.0016)%1)),wy=H*0.30+Math.sin(t*0.02)*10*devicePixelRatio,s=devicePixelRatio;
+  ctx.save();ctx.translate(wx,wy);ctx.scale(s,s);
+  ctx.beginPath();ctx.moveTo(-26,8);ctx.lineTo(0,-6);ctx.lineTo(26,8);ctx.lineTo(14,5);ctx.lineTo(0,0);ctx.lineTo(-14,5);ctx.closePath();
+  ctx.fillStyle='#8b929a';ctx.fill();
+  ctx.strokeStyle='rgba(229,72,77,.8)';ctx.setLineDash([4,3]);ctx.strokeRect(-34,-14,68,28);
+  ctx.restore();
+  t++;if(!reduce)requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>

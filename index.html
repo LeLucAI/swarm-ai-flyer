@@ -168,6 +168,27 @@
     .det,.det-label{opacity:1}
   }
 
+  /* ---------- team ---------- */
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+  .member{background:var(--panel);border:1px solid var(--line);padding:22px 22px 24px;display:flex;flex-direction:column}
+  .member .top{display:flex;align-items:center;gap:16px}
+  .avatar{width:54px;height:54px;flex:0 0 54px;border-radius:50%;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;letter-spacing:.04em;color:var(--gray);background:#0c0c0c}
+  .member.founder .avatar{border-color:var(--amber);color:var(--amber)}
+  .member .who{display:flex;flex-direction:column}
+  .member .who b{font-size:16px;letter-spacing:.02em}
+  .member .who .role{color:var(--teal);font-size:11.5px;font-weight:700;letter-spacing:.12em;margin-top:4px;text-transform:uppercase}
+  .member.founder .who .role{color:var(--amber)}
+  .member .cred{margin-top:16px;color:var(--gray);font-size:13px;line-height:1.55;border-top:1px solid var(--line);padding-top:14px}
+  .network{margin-top:30px;border:1px solid var(--line)}
+  .network .row{display:flex;flex-wrap:wrap;gap:6px 0;align-items:baseline;padding:18px 24px}
+  .network .row + .row{border-top:1px solid var(--line)}
+  .network .lbl{color:var(--amber);font-weight:700;font-size:12px;letter-spacing:.2em;flex:0 0 150px}
+  .network .lbl.teal{color:var(--teal)}
+  .network .orgs{color:#cfcfcf;font-size:13.5px;letter-spacing:.05em;flex:1;min-width:260px}
+  .network .orgs i{color:#4a4a4a;font-style:normal;margin:0 9px}
+  .team-claim{margin-top:30px;color:var(--amber);font-size:clamp(16px,2vw,24px);font-weight:700;font-style:italic;line-height:1.4;max-width:1050px}
+
   .print-alt{display:none}
 
   /* =========== PRINT =========== */
@@ -202,6 +223,13 @@
     footer{page-break-inside:avoid}
     section#mantyx{page-break-before:always}
     section#battle{page-break-before:always}
+    section#team{page-break-before:always}
+    .team-grid{gap:4mm}
+    .member{padding:4mm}
+    .member .cred{font-size:9pt;margin-top:3mm;padding-top:3mm}
+    .avatar{width:12mm;height:12mm;flex-basis:12mm}
+    .network .row{padding:3mm 5mm}
+    .team-claim{font-size:13pt}
   }
 </style>
 </head>
@@ -340,13 +368,13 @@
     <div class="step rv"><div class="n">01</div><h3><span>&gt;&gt;</span> Collect_</h3><p>Every node scans 360&deg;, day &amp; night, over any area you need covered.</p></div>
     <div class="step rv"><div class="n">02</div><h3><span>&gt;&gt;</span> Perceive_</h3><p>On-board AI turns raw imagery into 3D position, orientation and flight path of every target.</p></div>
     <div class="step rv"><div class="n">03</div><h3><span>&gt;&gt;</span> Connect_</h3><p>Nodes fuse raw, low-level data across the mesh — many eyes become one sensor.</p></div>
-    <div class="step rv"><div class="n">04</div><h3><span>&gt;&gt;</span> Reconstruct_</h3><p>The battlespace, rebuilt live in 3D — for operators, C2 and effectors.</p></div>
+    <div class="step rv"><div class="n">04</div><h3><span>&gt;&gt;</span> Reconstruct_</h3><p>One shared world model: operators see it, C2 commands on it, autonomous systems act on it.</p></div>
   </div>
 </section>
 
 <!-- ============ BATTLESPACE ============ -->
 <section id="battle">
-  <div class="kicker rv">LIVE 3D BATTLESPACE_<span class="sub">the mesh rebuilds terrain and every moving object in 3D</span></div>
+  <div class="kicker rv">LIVE 3D BATTLESPACE_<span class="sub">a live, machine-readable world model of the battlefield</span></div>
   <div class="wrap">
     <div class="svgbox rv" id="battlesvg">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1860 800" font-family="Arial, Helvetica, sans-serif">
@@ -471,7 +499,7 @@
 
     <!-- title -->
     <text x="70" y="88" fill="#F5A700" font-size="40" font-weight="bold" letter-spacing="3">LIVE 3D BATTLESPACE_</text>
-    <text x="70" y="130" fill="#9A9A9A" font-size="27">the mesh rebuilds terrain and every moving object in 3D</text>
+    <text x="70" y="130" fill="#9A9A9A" font-size="27">a machine-readable world model — humans see it, machines act on it</text>
 
     <!-- bottom caption -->
     <text x="70" y="755" fill="#8A8A8A" font-size="24"><tspan fill="#F5A700" font-style="italic" font-weight="bold">&gt;&gt; field-proven_</tspan>  live 3D pose &amp; track demonstrated in field tests</text>
@@ -479,8 +507,10 @@
 </svg>
 </div>
     <div class="rv">
-      <p class="lead">Operators don't watch twenty video feeds. They see one reconstructed 3D world —
-        terrain, threats, trajectories — and machines get the same picture in their own language.</p>
+      <p class="lead">Operators see one live 3D picture instead of twenty video feeds. Autonomous systems get
+        what video can never give them: a machine-readable world model — positions, trajectories, terrain —
+        the data they need to navigate, deconflict and engage. All from passive optics: nothing that jams,
+        nothing that betrays your position.</p>
       <div class="chips">
         <div class="chip"><b>LOW DATA_</b><span>kilobits, not gigabytes — works over contested, thin battlefield links</span></div>
         <div class="chip teal"><b>HUMAN ON THE LOOP_</b><span>one operator supervises; every engagement decision stays human</span></div>
@@ -494,7 +524,7 @@
     <img class="print-alt" src="assets/recon-world.jpg" alt="3D reconstructed terrain">
     <div class="tracker"></div>
     <div class="tag">RECONSTRUCTED WORLD_ REAL OUTPUT</div>
-    <div class="cap"><b>Actual 3D reconstruction:</b> terrain rebuilt from imagery, with the full flight path of a tracked flyer — every pose, in world coordinates. The same pipeline tracks UAVs.</div>
+    <div class="cap"><b>Actual 3D reconstruction:</b> terrain rebuilt from imagery, with the full flight path of a tracked flyer — every pose, in world coordinates. The same world model tracks UAVs and guides autonomous systems.</div>
   </div>
 </section>
 
@@ -530,6 +560,43 @@
   </div>
 </section>
 
+<!-- ============ TEAM ============ -->
+<section id="team">
+  <div class="kicker rv">TEAM_<span class="sub">leading experts in 3D computer vision, cloud &amp; defence delivery</span></div>
+  <div class="team-grid">
+    <div class="member founder rv">
+      <div class="top"><div class="avatar">LK</div><div class="who"><b>Dr. Lukas Karge</b><span class="role">CEO &middot; Co-Founder</span></div></div>
+      <div class="cred">Head of Mercedes-Benz AI Platform &middot; ex-BMW AI developer &middot; AI &amp; materials-science researcher.</div>
+    </div>
+    <div class="member founder rv">
+      <div class="top"><div class="avatar">BB</div><div class="who"><b>Prof. Dr. Benjamin Busam</b><span class="role">Research Lead &middot; Co-Founder</span></div></div>
+      <div class="cred">TUM Head of Photogrammetry &amp; Remote Sensing &middot; ex-Huawei &middot; Founder 3Dwe.</div>
+    </div>
+    <div class="member founder rv">
+      <div class="top"><div class="avatar">MG</div><div class="who"><b>M.Sc. Michael Greza</b><span class="role">CTO &middot; Co-Founder</span></div></div>
+      <div class="cred">Founder Obsphera &middot; TUM researcher &middot; cloud &amp; edge systems.</div>
+    </div>
+    <div class="member founder rv">
+      <div class="top"><div class="avatar">MK</div><div class="who"><b>M.Sc. Mert Kiray</b><span class="role">Lead AI &middot; Co-Founder</span></div></div>
+      <div class="cred">Founder Octovan &middot; 3Dwe researcher &middot; 3D perception &amp; tracking.</div>
+    </div>
+    <div class="member rv">
+      <div class="top"><div class="avatar">YV</div><div class="who"><b>M.Sc. Yordanka Velikova</b><span class="role">Detection &amp; Tracking</span></div></div>
+      <div class="cred">Robotics &middot; TUM researcher &middot; multi-object detection &amp; tracking.</div>
+    </div>
+    <div class="member rv">
+      <div class="top"><div class="avatar">ED</div><div class="who"><b>M.Sc. Enea Dragoni</b><span class="role">Hardware Integration Architect</span></div></div>
+      <div class="cred">TUM researcher &middot; sensor hardware &amp; edge-compute integration.</div>
+    </div>
+  </div>
+  <div class="network rv">
+    <div class="row"><div class="lbl">RESEARCH_</div><div class="orgs">TUM<i>&middot;</i>ETH Zürich<i>&middot;</i>MIT<i>&middot;</i>Cambridge<i>&middot;</i>Oxford<i>&middot;</i>DFKI<i>&middot;</i>IP Paris<i>&middot;</i>MLZ</div></div>
+    <div class="row"><div class="lbl teal">INDUSTRY_</div><div class="orgs">Mercedes-Benz<i>&middot;</i>BMW<i>&middot;</i>NVIDIA<i>&middot;</i>Siemens<i>&middot;</i>Huawei<i>&middot;</i>Google<i>&middot;</i>Meta<i>&middot;</i>Microsoft<i>&middot;</i>Zeiss<i>&middot;</i>Databricks</div></div>
+    <div class="row"><div class="lbl">BACKED BY_</div><div class="orgs">TUM Venture Labs</div></div>
+  </div>
+  <div class="team-claim rv">&gt;&gt; A team of leading experts in 3D computer vision &amp; cloud — 10+ years industry experience and a top-tier network across industry &amp; academia.</div>
+</section>
+
 <footer>
   <div class="loop rv"><b>DEPLOY</b><span class="arr">&rarr;</span><b>PERCEIVE</b><span class="arr">&rarr;</span><b>ACT</b><span class="arr">&rarr;</span><b>LEARN</b><span class="arr">&#8635;</span></div>
   <div class="contact">
@@ -556,19 +623,27 @@
 /* ---------- restyle placeholder loops: slower + tinted (see CSS) ---------- */
 document.querySelectorAll('video.tint-amber, video.tint-teal').forEach(v=>{v.playbackRate=0.7});
 
-/* ---------- recon-world tracker: follows the tracked flyer, synced to video time ---------- */
+/* ---------- recon-world tracker: holds centre, then eases up to the top + slightly right ---------- */
 (function(){
   const rec=document.querySelector('.recon video'), trk=document.querySelector('.tracker');
   if(!rec||!trk) return;
-  // waypoints: [time s, x %, y %] of the lead flyer (box center)
-  const wp=[[0.0, 34.1, 48.2], [0.2, 34.1, 48.2], [0.4, 34.1, 48.2], [0.6, 34.4, 48.2], [0.8, 34.5, 55.7], [1.0, 34.6, 59.3], [1.2, 34.6, 61.0], [1.4, 35.5, 63.7], [1.6, 35.9, 69.8], [1.8, 33.4, 78.6], [2.0, 32.3, 82.6], [2.2, 31.8, 88.6], [2.4, 31.8, 92.3], [2.6, 31.7, 95.0], [2.8, 31.7, 95.0], [3.0, 31.9, 95.0], [3.2, 31.9, 95.0], [3.4, 29.6, 95.0], [3.6, 28.4, 95.0], [3.8, 27.4, 94.8], [4.0, 26.9, 95.0], [4.2, 26.8, 94.4], [4.4, 26.5, 94.8], [4.6, 25.5, 95.0], [4.8, 24.8, 95.0], [5.0, 24.7, 95.0], [5.2, 24.3, 95.0], [5.4, 24.9, 95.0], [5.6, 23.8, 95.0], [5.8, 23.3, 95.0], [6.0, 23.1, 92.7], [6.2, 23.1, 91.4], [6.4, 23.1, 92.2], [6.6, 22.7, 93.6], [6.8, 22.1, 95.0], [7.0, 21.8, 95.0], [7.2, 28.3, 95.0], [7.4, 31.7, 95.0], [7.6, 35.2, 95.0], [7.8, 36.8, 95.0], [8.0, 28.7, 95.0], [8.2, 24.6, 95.0], [8.4, 22.3, 95.0], [8.6, 21.7, 95.0], [8.8, 25.1, 95.0], [9.0, 26.6, 93.3], [9.2, 29.0, 91.2], [9.4, 27.4, 88.4], [9.6, 26.7, 87.1], [9.8, 24.4, 89.5], [10.0, 21.0, 94.2], [10.2, 19.0, 95.0], [10.4, 18.0, 95.0], [10.6, 17.6, 95.0], [10.8, 17.4, 95.0]];
+  const startX=50, startY=50;     // centred in the frame
+  const endX=55.5, endY=13;       // ~10% of centre to the right, near the top
+  const hold=0.40;                // fraction of the clip held in the middle first
+  const ease=t=>t*t*(3-2*t);      // smoothstep for a slow, gentle move
+  let px=null, py=null;
   function step(){
-    const t=rec.currentTime||0;
-    let i=0; while(i<wp.length-2 && wp[i+1][0]<=t) i++;
-    const a=wp[i], b=wp[i+1], f=Math.min(1,Math.max(0,(t-a[0])/(b[0]-a[0])));
-    trk.style.left=(a[1]+(b[1]-a[1])*f)+'%';
-    trk.style.top =(a[2]+(b[2]-a[2])*f)+'%';
-    trk.style.opacity = t>10.4 ? 0 : 1;   // hide over loop cut, re-acquire
+    const dur=rec.duration||11, t=rec.currentTime||0, p=Math.min(1,t/dur);
+    const f = p>hold ? ease((p-hold)/(1-hold)) : 0;
+    const tx=startX+(endX-startX)*f, ty=startY+(endY-startY)*f;
+    if(px===null){px=tx;py=ty;}
+    px += (tx-px)*0.12;                       // smooth tracking lag
+    py += (ty-py)*0.12;
+    const jx=Math.sin(t*7.3)*0.35+Math.sin(t*13.7)*0.2;  // subtle estimation jitter
+    const jy=Math.cos(t*6.1)*0.3+Math.sin(t*11.3)*0.18;
+    trk.style.left=(px+jx)+'%';
+    trk.style.top =(py+jy)+'%';
+    trk.style.opacity=1;
     requestAnimationFrame(step);
   }
   rec.addEventListener('playing',()=>requestAnimationFrame(step),{once:true});
